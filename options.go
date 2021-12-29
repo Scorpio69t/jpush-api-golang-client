@@ -1,12 +1,16 @@
 package jpushclient
 
 type Options struct {
-	SendNo            int           `json:"sendno,omitempty"`
-	TimeToLive        int           `json:"time_to_live,omitempty"`
-	OverrideMsgId     int           `json:"override_msg_id,omitempty"`
-	ApnsProduction    bool          `json:"apns_production,omitempty"`
-	BigPushDuration   int           `json:"big_push_duration,omitempty"`
-	ThirdPartyChannel []interface{} `json:"thirdparty_channel,omitempty"`
+	SendNo            int               `json:"sendno,omitempty"`
+	TimeToLive        int               `json:"time_to_live,omitempty"`
+	OverrideMsgId     int               `json:"override_msg_id,omitempty"`
+	ApnsProduction    bool              `json:"apns_production,omitempty"`
+	BigPushDuration   int               `json:"big_push_duration,omitempty"`
+	ThirdPartyChannel ThirdPartyChannel `json:"thirdparty_channel,omitempty"`
+}
+
+type ThirdPartyChannel struct {
+	channels map[string]interface{}
 }
 
 // SetSendNo 设置消息的发送编号，用来覆盖推送时由 JPush 生成的编号。
@@ -35,6 +39,9 @@ func (o *Options) SetBigPushDuration(bigPushDuration int) {
 }
 
 // SetThirdPartyChannel 设置第三方渠道。
-func (o *Options) SetThirdPartyChannel(thirdPartyChannel []interface{}) {
-	o.ThirdPartyChannel = thirdPartyChannel
+func (o *Options) SetThirdPartyChannel(channel string, value interface{}) {
+	if o.ThirdPartyChannel.channels == nil {
+		o.ThirdPartyChannel.channels = make(map[string]interface{})
+	}
+	o.ThirdPartyChannel.channels[channel] = value
 }
