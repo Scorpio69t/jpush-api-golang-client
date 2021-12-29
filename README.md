@@ -1,2 +1,2 @@
-# -jpush-api-go-client
-极光推送  Server Golang SDK 
+# jpush-api-golang-client
+JPush's Golang client library for accessing JPush APIs. 极光推送的 Golang 版本服务器端 SDK。
