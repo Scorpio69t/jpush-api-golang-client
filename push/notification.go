@@ -1,10 +1,11 @@
 package push
 
 type Notification struct {
-	AiOpportunity bool                 `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。
-	Alert         string               `json:"alert,omitempty"`          // 通知的内容在各个平台上，都可能只有这一个最基本的属性 "alert"。
-	Android       *AndroidNotification `json:"android,omitempty"`        // Android通知
-	Ios           *IosNotification     `json:"ios,omitempty"`            // iOS通知
+	AiOpportunity bool                  `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。
+	Alert         string                `json:"alert,omitempty"`          // 通知的内容在各个平台上，都可能只有这一个最基本的属性 "alert"。
+	Android       *AndroidNotification  `json:"android,omitempty"`        // Android通知
+	Ios           *IosNotification      `json:"ios,omitempty"`            // iOS通知
+	QuickApp      *QuickAppNotification `json:"quick_app,omitempty"`      // 快应用通知
 }
 
 type AndroidNotification struct {
@@ -43,4 +44,11 @@ type IosNotification struct {
 	Extras            interface{} `json:"extras,omitempty"`             // 扩展字段
 	ThreadId          string      `json:"thread-id,omitempty"`          // 通知分组, ios 的远程通知通过该属性来对通知进行分组，同一个 thread-id 的通知归为一组。
 	InterruptionLevel string      `json:"interruption-level,omitempty"` // 通知优先级和交付时间的中断级别, ios15 的通知级别，取值只能是active,critical,passive,timeSensitive中的一个。
+}
+
+type QuickAppNotification struct {
+	Title  string      `json:"title"`            // 通知标题, 必填字段，快应用推送通知的标题
+	Alert  string      `json:"alert"`            // 通知内容, 这里指定了，则会覆盖上级统一指定的 alert 信息。
+	Page   string      `json:"page"`             // 通知跳转页面, 必填字段，快应用通知跳转地址。
+	Extras interface{} `json:"extras,omitempty"` // 扩展字段, 这里自定义 Key / value 信息，以供业务使用。
 }
