@@ -4,6 +4,7 @@ type Notification struct {
 	AiOpportunity bool                 `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。
 	Alert         string               `json:"alert,omitempty"`          // 通知的内容在各个平台上，都可能只有这一个最基本的属性 "alert"。
 	Android       *AndroidNotification `json:"android,omitempty"`        // Android通知
+	Ios           *IosNotification     `json:"ios,omitempty"`            // iOS通知
 }
 
 type AndroidNotification struct {
@@ -32,7 +33,7 @@ type AndroidNotification struct {
 	DisplayForeground string      `json:"display_foreground,omitempty"` //APP在前台，通知是否展示, 值为 "1" 时，APP 在前台会弹出通知栏消息；值为 "0" 时，APP 在前台不会弹出通知栏消息。
 }
 
-type IOSNotification struct {
+type IosNotification struct {
 	Alert             interface{} `json:"alert"`                        // 通知内容
 	Sound             interface{} `json:"sound,omitempty"`              // 通知提示声音或警告通知
 	Badge             int         `json:"badge,omitempty"`              // 应用角标, 如果不填，表示不改变角标数字，否则把角标数字改为指定的数字；为 0 表示清除。
