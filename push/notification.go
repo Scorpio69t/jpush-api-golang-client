@@ -6,6 +6,7 @@ type Notification struct {
 	Android       *AndroidNotification  `json:"android,omitempty"`        // Android通知
 	Ios           *IosNotification      `json:"ios,omitempty"`            // iOS通知
 	QuickApp      *QuickAppNotification `json:"quick_app,omitempty"`      // 快应用通知
+	WinPhone      *WinPhoneNotification `json:"winphone,omitempty"`       // Windows Phone通知
 }
 
 type AndroidNotification struct {
@@ -51,4 +52,11 @@ type QuickAppNotification struct {
 	Alert  string      `json:"alert"`            // 通知内容, 这里指定了，则会覆盖上级统一指定的 alert 信息。
 	Page   string      `json:"page"`             // 通知跳转页面, 必填字段，快应用通知跳转地址。
 	Extras interface{} `json:"extras,omitempty"` // 扩展字段, 这里自定义 Key / value 信息，以供业务使用。
+}
+
+type WinPhoneNotification struct {
+	Alert    string      `json:"alert"`                // 通知内容, 必填字段，会填充到 toast 类型 text2 字段上。这里指定了，将会覆盖上级统一指定的 alert 信息；内容为空则不展示到通知栏。
+	Title    string      `json:"title,omitempty"`      // 通知标题, 会填充到 toast 类型 text1 字段上。
+	OpenPage string      `json:"_open_page,omitempty"` // 点击打开的页面名称, 点击打开的页面。会填充到推送信息的 param 字段上，表示由哪个 App 页面打开该通知。可不填，则由默认的首页打开。
+	Extras   interface{} `json:"extras,omitempty"`     // 扩展字段, 这里自定义 Key / value 信息，以供业务使用。
 }
