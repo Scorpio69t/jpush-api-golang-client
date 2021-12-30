@@ -1,5 +1,9 @@
 package push
 
+import (
+	"log"
+)
+
 type AudienceType string
 
 const (
@@ -19,6 +23,10 @@ func (a AudienceType) String() string {
 type Audience struct {
 	Object   interface{}
 	audience map[AudienceType][]string
+}
+
+func (a *Audience) Interface() interface{} {
+	return a.Object
 }
 
 // All set all audiences
@@ -63,6 +71,13 @@ func (a *Audience) SetABTest(abtests []string) {
 
 // set set audiences
 func (a *Audience) set(key AudienceType, v []string) {
+	switch a.Object.(type) {
+	case string:
+		log.Printf("audience already set all")
+		return // do nothing
+	default:
+	}
+
 	if a.audience == nil {
 		a.audience = make(map[AudienceType][]string)
 		a.Object = a.audience
