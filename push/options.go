@@ -1,4 +1,4 @@
-package jpushclient
+package push
 
 type Options struct {
 	SendNo            int               `json:"sendno,omitempty"`             //推送序号
@@ -11,6 +11,10 @@ type Options struct {
 }
 
 type ThirdChannelType string
+
+func (t ThirdChannelType) String() string {
+	return string(t)
+}
 
 const (
 	XIAOMI ThirdChannelType = "xiaomi"
@@ -76,5 +80,5 @@ func (o *Options) AddThirdPartyChannel(channel ThirdChannelType, value ThirdPart
 	if o.ThirdPartyChannel.channels == nil {
 		o.ThirdPartyChannel.channels = make(map[string]ThirdPartyOptions)
 	}
-	o.ThirdPartyChannel.channels[string(channel)] = value
+	o.ThirdPartyChannel.channels[channel.String()] = value
 }
