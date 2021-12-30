@@ -31,3 +31,15 @@ type AndroidNotification struct {
 	ShowEndTime       string      `json:"show_end_time,omitempty"`      //定时展示结束时间（yyyy-MM-dd HH:mm:ss）
 	DisplayForeground string      `json:"display_foreground,omitempty"` //APP在前台，通知是否展示, 值为 "1" 时，APP 在前台会弹出通知栏消息；值为 "0" 时，APP 在前台不会弹出通知栏消息。
 }
+
+type IOSNotification struct {
+	Alert             interface{} `json:"alert"`                        // 通知内容
+	Sound             interface{} `json:"sound,omitempty"`              // 通知提示声音或警告通知
+	Badge             int         `json:"badge,omitempty"`              // 应用角标, 如果不填，表示不改变角标数字，否则把角标数字改为指定的数字；为 0 表示清除。
+	ContentAvailable  bool        `json:"content-available,omitempty"`  // 推送唤醒
+	MutableContent    bool        `json:"mutable-content,omitempty"`    // 通知扩展
+	Category          string      `json:"category,omitempty"`           // 通知类别, IOS 8 才支持。设置 APNs payload 中的 "category" 字段值
+	Extras            interface{} `json:"extras,omitempty"`             // 扩展字段
+	ThreadId          string      `json:"thread-id,omitempty"`          // 通知分组, ios 的远程通知通过该属性来对通知进行分组，同一个 thread-id 的通知归为一组。
+	InterruptionLevel string      `json:"interruption-level,omitempty"` // 通知优先级和交付时间的中断级别, ios15 的通知级别，取值只能是active,critical,passive,timeSensitive中的一个。
+}
