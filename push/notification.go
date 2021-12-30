@@ -7,6 +7,7 @@ type Notification struct {
 	Ios           *IosNotification      `json:"ios,omitempty"`            // iOS通知
 	QuickApp      *QuickAppNotification `json:"quick_app,omitempty"`      // 快应用通知
 	WinPhone      *WinPhoneNotification `json:"winphone,omitempty"`       // Windows Phone通知
+	Voip          interface{}           `json:"voip,omitempty"`           // iOS VOIP功能。
 }
 
 type AndroidNotification struct {
@@ -59,4 +60,39 @@ type WinPhoneNotification struct {
 	Title    string      `json:"title,omitempty"`      // 通知标题, 会填充到 toast 类型 text1 字段上。
 	OpenPage string      `json:"_open_page,omitempty"` // 点击打开的页面名称, 点击打开的页面。会填充到推送信息的 param 字段上，表示由哪个 App 页面打开该通知。可不填，则由默认的首页打开。
 	Extras   interface{} `json:"extras,omitempty"`     // 扩展字段, 这里自定义 Key / value 信息，以供业务使用。
+}
+
+// SetAlert 设置通知内容
+func (n *Notification) SetAlert(alert string) {
+	n.Alert = alert
+}
+
+// SetAiOpportunity 设置智能推送是否开启
+func (n *Notification) SetAiOpportunity(use bool) {
+	n.AiOpportunity = use
+}
+
+// SetAndroid 设置 Android 通知
+func (n *Notification) SetAndroid(android *AndroidNotification) {
+	n.Android = android
+}
+
+// SetIos 设置 iOS 通知
+func (n *Notification) SetIos(ios *IosNotification) {
+	n.Ios = ios
+}
+
+// SetQuickApp 设置 QuickApp 通知
+func (n *Notification) SetQuickApp(quickApp *QuickAppNotification) {
+	n.QuickApp = quickApp
+}
+
+// SetWinPhone 设置 WinPhone 通知
+func (n *Notification) SetWinPhone(winPhone *WinPhoneNotification) {
+	n.WinPhone = winPhone
+}
+
+// SetVoip 设置 Voip 通知
+func (n *Notification) SetVoip(value interface{}) {
+	n.Voip = value
 }
