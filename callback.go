@@ -1,4 +1,4 @@
-package push
+package jpush
 
 type CallBack struct {
 	Url    string                 `json:"url,omitempty"`    // 数据临时回调地址，指定后以此处指定为准，仅针对这一次推送请求生效；不指定，则以极光后台配置为准

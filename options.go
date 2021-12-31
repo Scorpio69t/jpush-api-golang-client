@@ -1,4 +1,4 @@
-package push
+package jpush
 
 type Options struct {
 	SendNo            int               `json:"sendno,omitempty"`             //推送序号

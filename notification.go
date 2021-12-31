@@ -1,4 +1,4 @@
-package push
+package jpush
 
 type Notification struct {
 	AiOpportunity bool                   `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。

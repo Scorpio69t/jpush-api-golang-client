@@ -1,4 +1,4 @@
-package push
+package jpush
 
 type Message struct {
 	MsgContent  string                 `json:"msg_content"`            // 消息内容本身
