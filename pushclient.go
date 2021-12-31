@@ -66,11 +66,6 @@ func (j *JPushClient) GetSchedule(id string) (string, error) {
 	return j.sendGetScheduleRequest(id)
 }
 
-// GetReport 获取消息推送结果
-func (j *JPushClient) GetReport(msg_ids string) (string, error) {
-	return j.sendGetReportRequest(msg_ids)
-}
-
 // SendPushString sends a push request and returns the response body as string
 func (j *JPushClient) sendPushString(content string) (string, error) {
 	ret, err := SendPostString(HOST_PUSH, content, j.AppKey, j.MasterSecret)
@@ -111,20 +106,6 @@ func (j *JPushClient) sendScheduleBytes(content []byte) (string, error) {
 	}
 
 	return "", errors.New(ret)
-}
-
-// SendGetReportRequest sends a get report request and returns the response body as string
-func (j *JPushClient) sendGetReportRequest(msg_ids string) (string, error) {
-	req := Get(HOST_REPORT)
-	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
-	req.SetHeader("Connection", "Keep-Alive")
-	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(j.AppKey, j.MasterSecret)
-	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
-	req.SetProtocolVersion("HTTP/1.1")
-	req.SetQueryParam("msg_ids", msg_ids)
-
-	return req.String()
 }
 
 // SendGetScheduleRequest sends a get schedule request and returns the response body as string
