@@ -7,6 +7,11 @@ type Message struct {
 	Extras      map[string]interface{} `json:"extras,omitempty"`       // JSON 格式的可选参数
 }
 
+// inapp_message 面向于通知栏消息类型，对于通知权限关闭的用户可设置启用此功能。此功能启用后，当用户前台运行APP时，会通过应用内消息的方式展示通知栏消息内容。
+type InappMessage struct {
+	InAppMessage bool `json:"inapp_message"`
+}
+
 // SetContent 设置消息内容
 func (m *Message) SetContent(content string) {
 	m.MsgContent = content
@@ -33,4 +38,9 @@ func (m *Message) AddExtras(key string, value interface{}) {
 		m.Extras = make(map[string]interface{})
 	}
 	m.Extras[key] = value
+}
+
+// SetInAppMessage 设置是否启用应用内消息
+func (i *InappMessage) SetInAppMessage(inAppMessage bool) {
+	i.InAppMessage = inAppMessage
 }

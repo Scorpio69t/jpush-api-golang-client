@@ -1,13 +1,13 @@
 package push
 
 type Notification struct {
-	AiOpportunity bool                  `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。
-	Alert         string                `json:"alert,omitempty"`          // 通知的内容在各个平台上，都可能只有这一个最基本的属性 "alert"。
-	Android       *AndroidNotification  `json:"android,omitempty"`        // Android通知
-	Ios           *IosNotification      `json:"ios,omitempty"`            // iOS通知
-	QuickApp      *QuickAppNotification `json:"quick_app,omitempty"`      // 快应用通知
-	WinPhone      *WinPhoneNotification `json:"winphone,omitempty"`       // Windows Phone通知
-	Voip          interface{}           `json:"voip,omitempty"`           // iOS VOIP功能。
+	AiOpportunity bool                   `json:"ai_opportunity,omitempty"` // 如需采用“智能时机”策略下发通知，必须指定该字段。
+	Alert         string                 `json:"alert,omitempty"`          // 通知的内容在各个平台上，都可能只有这一个最基本的属性 "alert"。
+	Android       *AndroidNotification   `json:"android,omitempty"`        // Android通知
+	Ios           *IosNotification       `json:"ios,omitempty"`            // iOS通知
+	QuickApp      *QuickAppNotification  `json:"quick_app,omitempty"`      // 快应用通知
+	WinPhone      *WinPhoneNotification  `json:"winphone,omitempty"`       // Windows Phone通知
+	Voip          map[string]interface{} `json:"voip,omitempty"`           // iOS VOIP功能。
 }
 
 type AndroidNotification struct {
@@ -93,6 +93,6 @@ func (n *Notification) SetWinPhone(winPhone *WinPhoneNotification) {
 }
 
 // SetVoip 设置 Voip 通知
-func (n *Notification) SetVoip(value interface{}) {
+func (n *Notification) SetVoip(value map[string]interface{}) {
 	n.Voip = value
 }
