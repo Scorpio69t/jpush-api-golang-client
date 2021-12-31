@@ -1,6 +1,10 @@
 package push
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/Scorpio69t/jpush-api-golang-client/http/httplib"
+)
 
 const (
 	base_url = "https://api.jpush.cn/v3/push/cid"
@@ -41,10 +45,7 @@ func (c *CidRequest) getUrl() string {
 // GetCidList 获取 CID 列表
 func (c *CidRequest) GetCidList() ([]string, error) {
 	var cid_list []string
-	// err := SendRequest(c.getUrl(), c, &cid_list)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	jc := httplib.NewJPushClient("", "")
 
 	return cid_list, nil
 }

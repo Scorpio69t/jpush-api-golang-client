@@ -65,6 +65,17 @@ func Put(url string) *HttpRequest {
 	return &HttpRequest{url, &req, map[string]string{}, 60 * time.Second, 60 * time.Second, nil, nil, nil}
 }
 
+// SetQueryParam replaces the request query values.
+func (h *HttpRequest) SetQueryParam(key, value string) *HttpRequest {
+	if h.req.URL == nil {
+		return h
+	}
+	q := h.req.URL.Query()
+	q.Add(key, value)
+	h.req.URL.RawQuery = q.Encode()
+	return h
+}
+
 // SetTimeout sets connect time out and read-write time out for Request.
 func (h *HttpRequest) SetTimeout(connectTimeout, readWriteTimeout time.Duration) *HttpRequest {
 	h.connectTimeout = connectTimeout
