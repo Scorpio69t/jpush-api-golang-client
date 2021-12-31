@@ -22,6 +22,7 @@ func (c CidResponse) String() string {
 	return fmt.Sprintf("CidResponse{CidList: %v}", c.CidList)
 }
 
+// NewCidRequest 创建 CidRequest 对象
 func NewCidRequest(count int, push_type string) *CidRequest {
 	c := &CidRequest{}
 	if count <= 0 || count > 1000 {

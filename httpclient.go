@@ -1,7 +1,10 @@
 package jpush
 
 import (
-	"strconv"
+	"bytes"
+	"errors"
+	"io/ioutil"
+	"net/http"
 	"time"
 )
 
@@ -13,32 +16,13 @@ const (
 	DEFAULT_READ_WRITE_TIMEOUT = 60 // Read and write timeout in seconds
 )
 
-const (
-	cid_url = "https://api.jpush.cn/v3/push/cid"
-)
-
-type JPushClient struct {
-	appKey    string
-	appSecret string
-}
-
-// NewJPushClient returns a new *JPushClient
-func NewJPushClient(appKey string, appSecret string) *JPushClient {
-	return &JPushClient{appKey: appKey, appSecret: appSecret}
-}
-
-// GetAuthorization returns the authorization string
-func (c *JPushClient) GetAuthorization() string {
-	return c.appKey + ":" + c.appSecret
-}
-
 // SendPostString sends a post request and returns the response body as string
-func (c *JPushClient) SendPostString(url string, content string) (string, error) {
+func SendPostString(url string, content, appKey, masterSecret string) (string, error) {
 	req := Post(url)
 	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
 	req.SetHeader("Connection", "Keep-Alive")
 	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(c.appKey, c.appSecret)
+	req.SetBasicAuth(appKey, masterSecret)
 	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
 	req.SetProtocolVersion("HTTP/1.1")
 	req.SetBody(content)
@@ -46,12 +30,13 @@ func (c *JPushClient) SendPostString(url string, content string) (string, error)
 	return req.String()
 }
 
-func (c *JPushClient) SendPostBytes(url string, content []byte) (string, error) {
+// SendPostBytes sends a post request and returns the response body as bytes
+func SendPostBytes(url string, content []byte, appKey, masterSecret string) (string, error) {
 	req := Post(url)
 	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
 	req.SetHeader("Connection", "Keep-Alive")
 	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(c.appKey, c.appSecret)
+	req.SetBasicAuth(appKey, masterSecret)
 	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
 	req.SetProtocolVersion("HTTP/1.1")
 	req.SetBody(content)
@@ -59,28 +44,43 @@ func (c *JPushClient) SendPostBytes(url string, content []byte) (string, error) 
 	return req.String()
 }
 
-func (c *JPushClient) SendGet(url string) (string, error) {
+// SendPostBytes2 sends a post request and returns the response body as bytes
+func SendPostBytes2(url string, data []byte, appKey, masterSecret string) (string, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	req.Header.Add("Charset", CHARSET)
+	req.SetBasicAuth(appKey, masterSecret)
+	req.Header.Add("Content-Type", CONTENT_TYPE_JSON)
+	resp, err := client.Do(req)
+	if err != nil {
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+		return "", err
+	}
+
+	if resp == nil {
+		return "", errors.New("response is nil")
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
+
+// SendGet sends a get request and returns the response body as string
+func SendGet(url, appKey, masterSecret string) (string, error) {
 	req := Get(url)
 	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
 	req.SetHeader("Connection", "Keep-Alive")
 	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(c.appKey, c.appSecret)
+	req.SetBasicAuth(appKey, masterSecret)
 	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
 	req.SetProtocolVersion("HTTP/1.1")
 
 	return req.String()
-}
-
-func (c *JPushClient) GetCid(count int, push_type string) ([]byte, error) {
-	req := Get(cid_url)
-	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
-	req.SetHeader("Connection", "Keep-Alive")
-	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(c.appKey, c.appSecret)
-	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
-	req.SetProtocolVersion("HTTP/1.1")
-	req.SetQueryParam("count", strconv.Itoa(count))
-	req.SetQueryParam("type", push_type)
-
-	return req.Bytes()
 }
