@@ -8,6 +8,7 @@ type PayLoad struct {
 	Notification *Notification `json:"notification,omitempty"` // 推送内容
 	Message      *Message      `json:"message,omitempty"`      // 推送内容
 	Options      *Options      `json:"options,omitempty"`      // 推送选项
+	Cid          string        `json:"cid,omitempty"`          // 推送唯一标识符
 }
 
 // NewPayLoad 创建一个新的推送对象
