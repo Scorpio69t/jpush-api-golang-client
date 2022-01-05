@@ -1,13 +1,13 @@
 package jpush
 
 type Options struct {
-	SendNo            int               `json:"sendno,omitempty"`             //推送序号
-	TimeToLive        int               `json:"time_to_live,omitempty"`       //离线消息保留时长(秒)
-	OverrideMsgId     int               `json:"override_msg_id,omitempty"`    //要覆盖的消息 ID
-	ApnsProduction    bool              `json:"apns_production,omitempty"`    //APNs 是否生产环境
-	ApnsCollapseId    string            `json:"apns_collapse_id,omitempty"`   //更新 iOS 通知的标识符
-	BigPushDuration   int               `json:"big_push_duration,omitempty"`  //定速推送时长(分钟)
-	ThirdPartyChannel ThirdPartyChannel `json:"thirdparty_channel,omitempty"` //推送请求下发通道
+	SendNo            int               `json:"sendno,omitempty"`              //推送序号
+	TimeToLive        int               `json:"time_to_live,omitempty"`        //离线消息保留时长(秒)
+	OverrideMsgId     int               `json:"override_msg_id,omitempty"`     //要覆盖的消息 ID
+	ApnsProduction    bool              `json:"apns_production,omitempty"`     //APNs 是否生产环境
+	ApnsCollapseId    string            `json:"apns_collapse_id,omitempty"`    //更新 iOS 通知的标识符
+	BigPushDuration   int               `json:"big_push_duration,omitempty"`   //定速推送时长(分钟)
+	ThirdPartyChannel ThirdPartyChannel `json:"third_party_channel,omitempty"` //推送请求下发通道
 }
 
 type ThirdChannelType string

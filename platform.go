@@ -10,13 +10,18 @@ const (
 	WINPHONE PlatformType = "winphone"
 )
 
-func (p PlatformType) String() string {
-	return string(p)
-}
-
 type Platform struct {
 	Os      interface{}
-	osArray []PlatformType
+	osArray []string
+}
+
+func (p *Platform) Interface() interface{} {
+	switch p.Os.(type) {
+	case string:
+		return p.Os
+	default:
+	}
+	return p.osArray
 }
 
 // All set all platforms
@@ -27,7 +32,7 @@ func (p *Platform) All() {
 // Add add platform
 func (p *Platform) Add(os PlatformType) error {
 	if p.osArray == nil {
-		p.osArray = make([]PlatformType, 0)
+		p.osArray = make([]string, 0)
 	}
 
 	switch p.Os.(type) {
@@ -38,7 +43,7 @@ func (p *Platform) Add(os PlatformType) error {
 
 	// check if already added
 	for _, v := range p.osArray {
-		if v == os {
+		if v == string(os) {
 			return nil
 		}
 	}
@@ -49,7 +54,7 @@ func (p *Platform) Add(os PlatformType) error {
 	case ANDROID:
 		fallthrough
 	case WINPHONE:
-		p.osArray = append(p.osArray, os)
+		p.osArray = append(p.osArray, string(os))
 		p.Os = p.osArray
 	default:
 		return errors.New("invalid platform")
@@ -80,7 +85,7 @@ func (p *Platform) Remove(os PlatformType) error {
 	}
 
 	for i, v := range p.osArray {
-		if v == os {
+		if v == string(os) {
 			p.osArray = append(p.osArray[:i], p.osArray[i+1:]...)
 			if len(p.osArray) == 0 {
 				p.Os = nil

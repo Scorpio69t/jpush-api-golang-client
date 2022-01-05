@@ -46,5 +46,20 @@ func (p *PayLoad) SetOptions(options *Options) {
 
 // Bytes 返回推送对象的json字节数组
 func (p *PayLoad) Bytes() ([]byte, error) {
-	return json.Marshal(p)
+	payload := struct {
+		Platform     interface{}   `json:"platform"`
+		Audience     interface{}   `json:"audience"`
+		Notification *Notification `json:"notification,omitempty"`
+		Message      *Message      `json:"message,omitempty"`
+		Options      *Options      `json:"options,omitempty"`
+		Cid          string        `json:"cid,omitempty"`
+	}{
+		Platform:     p.Platform.Interface(),
+		Audience:     p.Audience.Interface(),
+		Notification: p.Notification,
+		Message:      p.Message,
+		Options:      p.Options,
+		Cid:          p.Cid,
+	}
+	return json.Marshal(payload)
 }

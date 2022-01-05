@@ -44,6 +44,7 @@ func main() {
 	// Send
 	c := jpush.NewJPushClient("appKey", "masterSecret") // appKey and masterSecret can be gotten from https://www.jiguang.cn/
 	data, err := payload.Bytes()
+	fmt.Printf("%s\n", string(data))
 	if err != nil {
 		panic(err)
 	}
