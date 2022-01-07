@@ -11,8 +11,8 @@ type Notification struct {
 }
 
 type AndroidNotification struct {
-	Alert             string                 `json:"alert"`                        // 通知内容
-	Title             string                 `json:"title,omitempty"`              // 通知标题
+	Alert             interface{}            `json:"alert"`                        // 通知内容
+	Title             interface{}            `json:"title,omitempty"`              // 通知标题
 	BuilderID         int                    `json:"builder_id,omitempty"`         // 通知栏样式 ID
 	ChannelId         string                 `json:"channel_id,omitempty"`         // android通知channel_id
 	Priority          int                    `json:"priority,omitempty"`           // 通知栏展示优先级, 默认为 0，范围为 -2～2。
@@ -39,7 +39,7 @@ type AndroidNotification struct {
 type IosNotification struct {
 	Alert             interface{}            `json:"alert"`                        // 通知内容
 	Sound             interface{}            `json:"sound,omitempty"`              // 通知提示声音或警告通知
-	Badge             int                    `json:"badge,omitempty"`              // 应用角标, 如果不填，表示不改变角标数字，否则把角标数字改为指定的数字；为 0 表示清除。
+	Badge             interface{}            `json:"badge,omitempty"`              // 应用角标, 如果不填，表示不改变角标数字，否则把角标数字改为指定的数字；为 0 表示清除。
 	ContentAvailable  bool                   `json:"content-available,omitempty"`  // 推送唤醒
 	MutableContent    bool                   `json:"mutable-content,omitempty"`    // 通知扩展
 	Category          string                 `json:"category,omitempty"`           // 通知类别, IOS 8 才支持。设置 APNs payload 中的 "category" 字段值
