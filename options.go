@@ -29,8 +29,8 @@ type ThirdPartyOptions struct {
 	Distribution          string      `json:"distribution,omitempty"`           //通知栏消息下发逻辑
 	DistributionFcm       string      `json:"distribution_fcm,omitempty"`       //通知栏消息fcm+国内厂商组合类型下发逻辑
 	DistributionCustomize string      `json:"distribution_customize,omitempty"` //自定义消息国内厂商类型下发逻辑
-	ChannelId             string      `json:"channel_id,omitempty"`             //通知栏消息分类
-	SkipQuota             bool        `json:"skip_quota,omitempty"`             //配额判断及扣除, 目前仅对小米和oppo有效
+	ChannelId             string      `json:"channel_id"`                       //通知栏消息分类
+	SkipQuota             bool        `json:"skip_quota"`                       //配额判断及扣除, 目前仅对小米和oppo有效
 	Classification        string      `json:"classification,omitempty"`         //通知栏消息分类, 为了适配 vivo 手机厂商通知栏消息分类,“0”代表运营消息，“1”代表系统消息
 	PushMode              int         `json:"push_mode,omitempty"`              //通知栏消息类型, 对应 vivo 的 pushMode 字段,值分别是：“0”表示正式推送；“1”表示测试推送，不填默认为0
 	Importance            string      `json:"importance,omitempty"`             //华为通知栏消息智能分类, 为了适配华为手机厂商的通知栏消息智能分类
@@ -44,11 +44,10 @@ type ThirdPartyOptions struct {
 	Inbox                 interface{} `json:"inbox,omitempty"`                  //厂商消息inbox样式, 目前支持华为厂商
 	BigPicPath            string      `json:"big_pic_path,omitempty"`           //厂商big_pic_path, 为了适配厂商的消息大图片样式,目前支持小米/oppo两个厂商
 	OnlyUseVendorStyle    bool        `json:"only_use_vendor_style,omitempty"`  //是否是否使用自身通道设置样式
+	CallbackId            string      `json:"callback_id,omitempty"`            // vivo厂商通道回调ID
 }
 
-type ThirdPartyChannel struct {
-	channels map[string]ThirdPartyOptions
-}
+type ThirdPartyChannel map[string]ThirdPartyOptions
 
 // SetSendNo 设置消息的发送编号，用来覆盖推送时由 JPush 生成的编号。
 func (o *Options) SetSendNo(sendNo int) {
@@ -77,8 +76,8 @@ func (o *Options) SetBigPushDuration(bigPushDuration int) {
 
 // AddThirdPartyChannel 添加第三方渠道。
 func (o *Options) AddThirdPartyChannel(channel ThirdChannelType, value ThirdPartyOptions) {
-	if o.ThirdPartyChannel.channels == nil {
-		o.ThirdPartyChannel.channels = make(map[string]ThirdPartyOptions)
+	if o.ThirdPartyChannel == nil {
+		o.ThirdPartyChannel = make(ThirdPartyChannel)
 	}
-	o.ThirdPartyChannel.channels[channel.String()] = value
+	o.ThirdPartyChannel[channel.String()] = value
 }
