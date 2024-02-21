@@ -47,7 +47,7 @@ type ThirdPartyOptions struct {
 }
 
 type ThirdPartyChannel struct {
-	channels map[string]ThirdPartyOptions
+	Channels map[string]ThirdPartyOptions
 }
 
 // SetSendNo 设置消息的发送编号，用来覆盖推送时由 JPush 生成的编号。
@@ -77,8 +77,8 @@ func (o *Options) SetBigPushDuration(bigPushDuration int) {
 
 // AddThirdPartyChannel 添加第三方渠道。
 func (o *Options) AddThirdPartyChannel(channel ThirdChannelType, value ThirdPartyOptions) {
-	if o.ThirdPartyChannel.channels == nil {
-		o.ThirdPartyChannel.channels = make(map[string]ThirdPartyOptions)
+	if o.ThirdPartyChannel.Channels == nil {
+		o.ThirdPartyChannel.Channels = make(map[string]ThirdPartyOptions)
 	}
-	o.ThirdPartyChannel.channels[channel.String()] = value
+	o.ThirdPartyChannel.Channels[channel.String()] = value
 }
