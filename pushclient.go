@@ -19,6 +19,7 @@ const (
 	HOST_SCHEDULE = "https://api.jpush.cn/v3/schedules"
 	HOST_REPORT   = "https://report.jpush.cn/v3/received"
 	HOST_CID      = "https://api.jpush.cn/v3/push/cid"
+	HOST_IMAGES   = "https://api.jpush.cn/v3/images"
 )
 
 // NewJPushClient returns a new JPushClient
