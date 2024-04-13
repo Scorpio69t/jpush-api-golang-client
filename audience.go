@@ -69,7 +69,7 @@ func (a *Audience) SetABTest(abtests []string) {
 	a.set(ABTEST, abtests)
 }
 
-// set set audiences
+// set audiences
 func (a *Audience) set(key AudienceType, v []string) {
 	switch a.Object.(type) {
 	case string:

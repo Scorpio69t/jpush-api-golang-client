@@ -3,7 +3,7 @@ package jpush
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
@@ -48,6 +48,9 @@ func SendPostBytes(url string, content []byte, appKey, masterSecret string) (str
 func SendPostBytes2(url string, data []byte, appKey, masterSecret string) (string, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	if err != nil {
+		return "", err
+	}
 	req.Header.Add("Charset", CHARSET)
 	req.SetBasicAuth(appKey, masterSecret)
 	req.Header.Add("Content-Type", CONTENT_TYPE_JSON)
@@ -64,7 +67,7 @@ func SendPostBytes2(url string, data []byte, appKey, masterSecret string) (strin
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

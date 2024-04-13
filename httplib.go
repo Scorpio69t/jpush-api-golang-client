@@ -2,13 +2,13 @@ package jpush
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -139,9 +139,9 @@ func (h *HttpRequest) SetTransport(transport http.RoundTripper) *HttpRequest {
 // example:
 //
 //	func(req *http.Request) (*url.URL, error) {
-// 		u, _ := url.ParseRequestURI("http://127.0.0.1:8118")
-// 		return u, nil
-// 	}
+//		u, _ := url.ParseRequestURI("http://127.0.0.1:8118")
+//		return u, nil
+//	}
 func (h *HttpRequest) SetProxy(proxy func(*http.Request) (*url.URL, error)) *HttpRequest {
 	h.proxy = proxy
 	return h
@@ -157,24 +157,24 @@ func (h *HttpRequest) SetParam(key, value string) *HttpRequest {
 // It supports string, []byte, url.Values, map[string]interface{} and io.Reader.
 func (h *HttpRequest) SetBody(body interface{}) *HttpRequest {
 	if h.req.Body == nil {
-		h.req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte("")))
+		h.req.Body = io.NopCloser(bytes.NewBuffer([]byte("")))
 	}
 	switch b := body.(type) {
 	case []byte:
-		h.req.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+		h.req.Body = io.NopCloser(bytes.NewBuffer(b))
 		h.req.ContentLength = int64(len(b))
 	case string:
-		h.req.Body = ioutil.NopCloser(bytes.NewBufferString(b))
+		h.req.Body = io.NopCloser(bytes.NewBufferString(b))
 		h.req.ContentLength = int64(len(b))
 	case io.Reader:
-		h.req.Body = ioutil.NopCloser(b)
+		h.req.Body = io.NopCloser(b)
 		if h.req.ContentLength == -1 {
 			if rc, ok := b.(io.ReadCloser); ok {
 				h.req.Body = rc
 			}
 		}
 	case url.Values:
-		h.req.Body = ioutil.NopCloser(bytes.NewBufferString(b.Encode()))
+		h.req.Body = io.NopCloser(bytes.NewBufferString(b.Encode()))
 		h.req.ContentLength = int64(len(b.Encode()))
 	case map[string]interface{}:
 		v := url.Values{}
@@ -194,13 +194,13 @@ func (h *HttpRequest) SetBody(body interface{}) *HttpRequest {
 				v.Set(k, strconv.FormatFloat(val.(float64), 'f', -1, 64))
 			}
 		}
-		h.req.Body = ioutil.NopCloser(bytes.NewBufferString(v.Encode()))
+		h.req.Body = io.NopCloser(bytes.NewBufferString(v.Encode()))
 		h.req.ContentLength = int64(len(v.Encode()))
 	default:
 		if v, ok := body.(io.ReadCloser); ok {
 			h.req.Body = v
 		} else {
-			h.req.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(fmt.Sprintf("%v", body))))
+			h.req.Body = io.NopCloser(bytes.NewBuffer([]byte(fmt.Sprintf("%v", body))))
 		}
 	}
 
@@ -240,7 +240,7 @@ func (h *HttpRequest) getResponse() (*http.Response, error) {
 
 	if h.req.Body != nil {
 		if strings.Contains(h.req.Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
-			b, _ := ioutil.ReadAll(h.req.Body)
+			b, _ := io.ReadAll(h.req.Body)
 			paramBody = string(b) + "&" + paramBody
 		} else {
 			return nil, errors.New("please use SetBody method instead")
@@ -258,38 +258,40 @@ func (h *HttpRequest) getResponse() (*http.Response, error) {
 		h.SetBody(paramBody)
 	}
 
-	url, err := url.Parse(h.url)
+	parse, err := url.Parse(h.url)
 	if err != nil {
 		return nil, err
 	}
 
-	if url.Scheme == "" {
+	if parse.Scheme == "" {
 		h.url = "http://" + h.url
-		url, err = url.Parse(h.url)
+		parse, err = parse.Parse(h.url)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	h.req.URL = url
+	h.req.URL = parse
 	trans := h.transport
 
 	if trans == nil {
 		trans = &http.Transport{
 			TLSClientConfig: h.tlsConfig,
 			Proxy:           h.proxy,
-			Dial:            TimeoutDialer(h.connectTimeout, h.readWriteTimeout),
+			DialContext:     TimeoutDialer(h.connectTimeout, h.readWriteTimeout),
 		}
 	} else {
 		if t, ok := trans.(*http.Transport); ok {
 			if t.TLSClientConfig == nil {
 				t.TLSClientConfig = h.tlsConfig
 			}
+
 			if t.Proxy == nil {
 				t.Proxy = h.proxy
 			}
-			if t.Dial == nil {
-				t.Dial = TimeoutDialer(h.connectTimeout, h.readWriteTimeout)
+
+			if t.DialContext == nil {
+				t.DialContext = TimeoutDialer(h.connectTimeout, h.readWriteTimeout)
 			}
 		}
 	}
@@ -307,13 +309,24 @@ func (h *HttpRequest) getResponse() (*http.Response, error) {
 }
 
 // TimeoutDialer returns functions of connection dialer with timeout settings for http.Transport Dial field.
-func TimeoutDialer(connectTimeout time.Duration, readWriteTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {
-	return func(netw, addr string) (net.Conn, error) {
-		conn, err := net.DialTimeout(netw, addr, connectTimeout)
+func TimeoutDialer(connectTimeout time.Duration, readWriteTimeout time.Duration) func(ctx context.Context, network, addr string) (c net.Conn, err error) {
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+		conn, err := (&net.Dialer{
+			Timeout:   connectTimeout,
+			KeepAlive: connectTimeout,
+		}).DialContext(ctx, network, addr) // DialContext is available since Go 1.7
+
 		if err != nil {
 			return nil, err
 		}
-		conn.SetDeadline(time.Now().Add(readWriteTimeout))
+
+		if readWriteTimeout > 0 {
+			err = conn.SetDeadline(time.Now().Add(readWriteTimeout)) // Set read/write timeout
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		return conn, nil
 	}
 }
@@ -333,7 +346,7 @@ func (h *HttpRequest) Bytes() ([]byte, error) {
 		return nil, nil
 	}
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // String returns the body string in response.

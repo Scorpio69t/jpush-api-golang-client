@@ -29,7 +29,7 @@ func (p *Platform) All() {
 	p.Os = "all"
 }
 
-// Add add platform
+// Add platform
 func (p *Platform) Add(os PlatformType) error {
 	if p.osArray == nil {
 		p.osArray = make([]string, 0)
@@ -65,17 +65,17 @@ func (p *Platform) Add(os PlatformType) error {
 
 // AddIOS add ios platform
 func (p *Platform) AddIOS() {
-	p.Add(IOS)
+	_ = p.Add(IOS)
 }
 
 // AddAndroid add android platform
 func (p *Platform) AddAndroid() {
-	p.Add(ANDROID)
+	_ = p.Add(ANDROID)
 }
 
 // AddWinphone add winphone platform
 func (p *Platform) AddWinphone() {
-	p.Add(WINPHONE)
+	_ = p.Add(WINPHONE)
 }
 
 // Remove remove platform

@@ -1,3 +1,3 @@
 module github.com/Scorpio69t/jpush-api-golang-client
 
-go 1.17
+go 1.22

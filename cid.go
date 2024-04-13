@@ -14,16 +14,16 @@ type CidResponse struct {
 	CidList []string `json:"cidlist,omitempty"` // CID 列表
 }
 
-func (c CidRequest) String() string {
+func (c *CidRequest) String() string {
 	return fmt.Sprintf("CidRequest{Count: %d, Type: %s}", c.Count, c.Type)
 }
 
-func (c CidResponse) String() string {
+func (c *CidResponse) String() string {
 	return fmt.Sprintf("CidResponse{CidList: %v}", c.CidList)
 }
 
 // NewCidRequest 创建 CidRequest 对象
-func NewCidRequest(count int, push_type string) *CidRequest {
+func NewCidRequest(count int, pushType string) *CidRequest {
 	c := &CidRequest{}
 	if count <= 0 || count > 1000 {
 		c.Count = 1
@@ -31,10 +31,10 @@ func NewCidRequest(count int, push_type string) *CidRequest {
 		c.Count = count
 	}
 
-	if push_type == "" {
+	if pushType == "" {
 		c.Type = "push"
 	} else {
-		c.Type = push_type
+		c.Type = pushType
 	}
 
 	return c
