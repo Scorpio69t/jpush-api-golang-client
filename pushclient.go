@@ -15,6 +15,7 @@ type JPushClient struct {
 
 const (
 	SUCCESS_FLAG  = "msg_id"
+	SMS           = "https://api.sms.jpush.cn/v1/messages"
 	HOST_PUSH     = "https://api.jpush.cn/v3/push"
 	HOST_SCHEDULE = "https://api.jpush.cn/v3/schedules"
 	HOST_REPORT   = "https://report.jpush.cn/v3/received"
@@ -45,6 +46,23 @@ func (j *JPushClient) GetCid(count int, push_type string) ([]byte, error) {
 	req.SetQueryParam("type", push_type)
 
 	return req.Bytes()
+}
+
+// 发送短信
+func (j *JPushClient) SendSms(data []byte) (string, error) {
+	return j.sendSmsBytes(data)
+}
+func (j *JPushClient) sendSmsBytes(content []byte) (string, error) {
+	ret, err := SendPostBytes2(SMS, content, j.AppKey, j.MasterSecret)
+	if err != nil {
+		return "", err
+	}
+
+	if strings.Contains(ret, SUCCESS_FLAG) {
+		return ret, nil
+	}
+
+	return "", errors.New(ret)
 }
 
 // Push 推送消息
