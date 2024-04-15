@@ -7,6 +7,12 @@ JPush's Golang client library for accessing JPush APIs. 极光推送的 Golang �
 该项目参考[ylywyn](https://github.com/ylywyn/jpush-api-go-client)结合极光推送官方文档而来。(原项目年久失修，有很多新特性都没有提供，本项目旨在将其完善，方便大家使用，后续会持续更新，不足之处欢迎大家指正，谢谢~)
 [参考REST API文档](https://docs.jiguang.cn/jpush/server/push/server_overview/)
 
+### 极光短信
+
+[参考短信 REST API 文档](https://docs.jiguang.cn/jsms/server/rest_api_summary)
+
+短信这边暂时只实现了发送单条模板短信
+
 **现已支持以下内容**
 
 - [x] Push API v3
@@ -16,6 +22,7 @@ JPush's Golang client library for accessing JPush APIs. 极光推送的 Golang �
 - [ ] File API v3
 - [ ] Image API v3
 - [ ] Admin API v3
+- [x] SMS API v1
 
 ## 使用
 `go get github.com/Scorpio69t/jpush-api-golang-client`
@@ -99,4 +106,6 @@ if err != nil {
 ```
 
 ### 6.详细例子见examples
+
+## 发送短信参见sms_test中的代码
 
