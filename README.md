@@ -5,6 +5,7 @@
 ## 概述
 JPush's Golang client library for accessing JPush APIs. 极光推送的 Golang 版本服务器端 SDK。
 该项目参考[ylywyn](https://github.com/ylywyn/jpush-api-go-client)结合极光推送官方文档而来。(原项目年久失修，有很多新特性都没有提供，本项目旨在将其完善，方便大家使用，后续会持续更新，不足之处欢迎大家指正，谢谢~)
+
 [参考REST API文档](https://docs.jiguang.cn/jpush/server/push/server_overview/)
 
 ### 极光短信
