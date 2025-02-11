@@ -7,13 +7,14 @@ import (
 type AudienceType string
 
 const (
-	TAG             AudienceType = "tag"             // 标签OR
-	TAG_AND         AudienceType = "tag_and"         // 标签AND
-	TAG_NOT         AudienceType = "tag_not"         // 标签NOT
-	ALIAS           AudienceType = "alias"           // 别名
-	REGISTRATION_ID AudienceType = "registration_id" // 注册ID
-	SEGMENT         AudienceType = "segment"         // 用户分群 ID
-	ABTEST          AudienceType = "abtest"          // A/B Test ID
+	TAG             AudienceType = "tag"              // 标签OR
+	TAG_AND         AudienceType = "tag_and"          // 标签AND
+	TAG_NOT         AudienceType = "tag_not"          // 标签NOT
+	ALIAS           AudienceType = "alias"            // 别名
+	REGISTRATION_ID AudienceType = "registration_id"  // 注册ID
+	SEGMENT         AudienceType = "segment"          // 用户分群 ID
+	ABTEST          AudienceType = "abtest"           // A/B Test ID
+	LIVEACTIVITYID  AudienceType = "live_activity_id" // 实时活动标识
 )
 
 func (a AudienceType) String() string {
@@ -22,7 +23,7 @@ func (a AudienceType) String() string {
 
 type Audience struct {
 	Object   interface{}
-	audience map[AudienceType][]string
+	audience map[AudienceType]interface{}
 }
 
 func (a *Audience) Interface() interface{} {
@@ -69,8 +70,13 @@ func (a *Audience) SetABTest(abtests []string) {
 	a.set(ABTEST, abtests)
 }
 
+// SetLiveActivityID set audiences by live_activity_id
+func (a *Audience) SetLiveActivityID(liveActivityID string) {
+	a.set(LIVEACTIVITYID, liveActivityID)
+}
+
 // set audiences
-func (a *Audience) set(key AudienceType, v []string) {
+func (a *Audience) set(key AudienceType, v interface{}) {
 	switch a.Object.(type) {
 	case string:
 		log.Printf("audience already set all")
@@ -79,7 +85,7 @@ func (a *Audience) set(key AudienceType, v []string) {
 	}
 
 	if a.audience == nil {
-		a.audience = make(map[AudienceType][]string)
+		a.audience = make(map[AudienceType]interface{})
 		a.Object = a.audience
 	}
 
