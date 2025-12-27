@@ -1,26 +1,26 @@
 # jpush-api-golang-client
 
-> Heads-up: this library is being actively refactored to modernize its APIs and structure. Expect changes to land soon; keep an eye on releases/changelog.
+> 提示：当前正在进行重构以现代化 API 和结构，近期可能有变更，请关注版本与变更日志。
 
-English is the default README. 中文说明请见 [README.zh.md](README.zh.md)。
+英文为默认说明，中文说明在此文件。如需英文请查看 `README.md`。
 
-## Overview
-Golang SDK for JPush REST APIs (push, schedule, report, CID, SMS). The current codebase mirrors the official docs with light helpers for HTTP requests and payload builders.
+## 概述
+极光推送 JPush REST API 的 Go 语言 SDK（推送、定时、报表、CID、短信）。现有代码基于官方文档并提供少量 HTTP 辅助封装与 payload 构建器。
 
-Supported today:
+当前支持：
 - ✅ Push API v3
 - ✅ Report API v3
 - ✅ Schedule API v3
-- ✅ SMS API v1 (template SMS send)
-- ⏳ Not yet: Device API v3, File API v3, Image API v3, Admin API v3
+- ✅ SMS API v1（模板短信发送）
+- ⏳ 尚未实现：Device API v3、File API v3、Image API v3、Admin API v3
 
-## Install
+## 安装
 ```bash
 go get github.com/Scorpio69t/jpush-api-golang-client
 ```
 
-## Quickstart (Push)
-1) Platform
+## 推送快速开始
+1) 平台
 ```go
 var pf jpush.Platform
 pf.Add(jpush.ANDROID)
@@ -29,7 +29,7 @@ pf.Add(jpush.WINPHONE)
 // pf.All()
 ```
 
-2) Audience
+2) 接收目标
 ```go
 var at jpush.Audience
 at.SetTag([]string{"tag1", "tag2"})
@@ -37,7 +37,7 @@ at.SetID([]string{"1", "2"})
 // at.All()
 ```
 
-3) Notification or Message
+3) 通知或自定义消息
 ```go
 var n jpush.Notification
 n.SetAlert("alert")
@@ -50,7 +50,7 @@ m.MsgContent = "This is a message"
 m.Title = "Hello"
 ```
 
-4) Payload
+4) 负载
 ```go
 payload := jpush.NewPayLoad()
 payload.SetPlatform(&pf)
@@ -59,9 +59,9 @@ payload.SetNotification(&n)
 payload.SetMessage(&m)
 ```
 
-5) Send
+5) 发送
 ```go
-c := jpush.NewJPushClient("appKey", "masterSecret") // obtain from https://www.jiguang.cn/
+c := jpush.NewJPushClient("appKey", "masterSecret") // 前往 https://www.jiguang.cn/ 获取
 data, err := payload.Bytes()
 if err != nil {
 	panic(err)
@@ -74,8 +74,7 @@ if err != nil {
 }
 ```
 
-See `examples/` for full push and CID samples.
+完整推送与 CID 样例见 `examples/`。
 
-## SMS
-Template SMS send is available (see `sms_test.go` for an end-to-end example). Fill your own `appKey`/`masterSecret` and template params before running tests.
-
+## 短信
+已支持模板短信发送，示例见 `sms_test.go`。运行前请填写自己的 `appKey`/`masterSecret` 和模板参数。
