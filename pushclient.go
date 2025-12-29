@@ -1,9 +1,10 @@
 package jpush
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"strconv"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -35,17 +36,15 @@ func (j *JPushClient) GetAuthorization() string {
 
 // GetCid returns the cid list as byte array
 func (j *JPushClient) GetCid(count int, push_type string) ([]byte, error) {
-	req := Get(HOST_CID)
-	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
-	req.SetHeader("Connection", "Keep-Alive")
-	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(j.AppKey, j.MasterSecret)
-	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
-	req.SetProtocolVersion("HTTP/1.1")
-	req.SetQueryParam("count", strconv.Itoa(count))
-	req.SetQueryParam("type", push_type)
-
-	return req.Bytes()
+	client, err := j.newModernClient()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.CID(context.Background(), count, push_type)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(resp)
 }
 
 // 发送短信
@@ -53,7 +52,11 @@ func (j *JPushClient) SendSms(data []byte) (string, error) {
 	return j.sendSmsBytes(data)
 }
 func (j *JPushClient) sendSmsBytes(content []byte) (string, error) {
-	ret, err := SendPostBytes2(SMS, content, j.AppKey, j.MasterSecret)
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	ret, err := client.doRaw(context.Background(), http.MethodPost, client.endpoints.SMS, content)
 	if err != nil {
 		return "", err
 	}
@@ -87,7 +90,11 @@ func (j *JPushClient) GetSchedule(id string) (string, error) {
 
 // SendPushString sends a push request and returns the response body as string
 func (j *JPushClient) sendPushString(content string) (string, error) {
-	ret, err := SendPostString(HOST_PUSH, content, j.AppKey, j.MasterSecret)
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	ret, err := client.doRaw(context.Background(), http.MethodPost, client.endpoints.Push, []byte(content))
 	if err != nil {
 		return "", err
 	}
@@ -101,7 +108,11 @@ func (j *JPushClient) sendPushString(content string) (string, error) {
 
 // SendPushBytes sends a push request and returns the response body as string
 func (j *JPushClient) sendPushBytes(content []byte) (string, error) {
-	ret, err := SendPostBytes2(HOST_PUSH, content, j.AppKey, j.MasterSecret)
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	ret, err := client.doRaw(context.Background(), http.MethodPost, client.endpoints.Push, content)
 	if err != nil {
 		return "", err
 	}
@@ -115,7 +126,11 @@ func (j *JPushClient) sendPushBytes(content []byte) (string, error) {
 
 // SendScheduleBytes sends a schedule request and returns the response body as string
 func (j *JPushClient) sendScheduleBytes(content []byte) (string, error) {
-	ret, err := SendPostBytes2(HOST_SCHEDULE, content, j.AppKey, j.MasterSecret)
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	ret, err := client.doRaw(context.Background(), http.MethodPost, client.endpoints.Schedule, content)
 	if err != nil {
 		return "", err
 	}
@@ -129,30 +144,22 @@ func (j *JPushClient) sendScheduleBytes(content []byte) (string, error) {
 
 // SendGetScheduleRequest sends a get schedule request and returns the response body as string
 func (j *JPushClient) sendGetScheduleRequest(schedule_id string) (string, error) {
-	req := Get(HOST_SCHEDULE)
-	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
-	req.SetHeader("Connection", "Keep-Alive")
-	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(j.AppKey, j.MasterSecret)
-	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
-	req.SetProtocolVersion("HTTP/1.1")
-	req.SetQueryParam("schedule_id", schedule_id)
-
-	return req.String()
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	url := client.endpoints.Schedule + "?schedule_id=" + schedule_id
+	return client.doRaw(context.Background(), http.MethodGet, url, nil)
 }
 
 // SendDeleteScheduleRequest sends a delete schedule request and returns the response body as string
 func (j *JPushClient) sendDeleteScheduleRequest(schedule_id string) (string, error) {
-	req := Delete(HOST_SCHEDULE)
-	req.SetTimeout(DEFAULT_CONNECT_TIMEOUT*time.Second, DEFAULT_READ_WRITE_TIMEOUT*time.Second)
-	req.SetHeader("Connection", "Keep-Alive")
-	req.SetHeader("Charset", CHARSET)
-	req.SetBasicAuth(j.AppKey, j.MasterSecret)
-	req.SetHeader("Content-Type", CONTENT_TYPE_JSON)
-	req.SetProtocolVersion("HTTP/1.1")
-	req.SetQueryParam("schedule_id", schedule_id)
-
-	return req.String()
+	client, err := j.newModernClient()
+	if err != nil {
+		return "", err
+	}
+	url := client.endpoints.Schedule + "?schedule_id=" + schedule_id
+	return client.doRaw(context.Background(), http.MethodDelete, url, nil)
 }
 
 // UnmarshalResponse unmarshals the response body to the map
@@ -174,3 +181,16 @@ func UnmarshalResponse(resp string) (map[string]interface{}, error) {
 
 	return ret, nil
 }
+
+func (j *JPushClient) newModernClient() (*Client, error) {
+	opts := []Option{WithTimeout(DEFAULT_CONNECT_TIMEOUT * time.Second)}
+	opts = append(opts, legacyClientOptions...)
+	return NewClient(j.AppKey, j.MasterSecret, opts...)
+}
+
+// SetLegacyClientOptions injects options for legacy wrappers (primarily for testing).
+func SetLegacyClientOptions(opts ...Option) {
+	legacyClientOptions = opts
+}
+
+var legacyClientOptions []Option

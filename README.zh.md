@@ -76,5 +76,28 @@ if err != nil {
 
 完整推送与 CID 样例见 `examples/`。
 
+## 现代化用法（推荐，支持 context）
+```go
+ctx := context.Background()
+c, err := jpush.NewClient("appKey", "masterSecret")
+if err != nil {
+    panic(err)
+}
+
+// 构建 payload 同上
+resp, err := c.Push(ctx, payload)
+if err != nil {
+    panic(err)
+}
+fmt.Println(resp.MsgID)
+```
+
+旧接口（如 `Push([]byte)`) 仍可用但已进入弃用通道，请尽快迁移到 `Client`/context API。
+
+## 迁移指引（从旧接口）
+- 将 `NewJPushClient` + `Push([]byte)` 替换为 `NewClient` + `Push(ctx, *PayLoad)`。
+- 如果需要链路追踪/Mock，可通过 `WithHTTPClient` 注入自定义 `http.Client`，超时用 `WithTimeout` 配置。
+- 使用结构化响应（如 `PushResponse`、`SMSResponse`），不再依赖字符串解析。
+
 ## 短信
 已支持模板短信发送，示例见 `sms_test.go`。运行前请填写自己的 `appKey`/`masterSecret` 和模板参数。

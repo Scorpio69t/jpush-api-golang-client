@@ -76,6 +76,29 @@ if err != nil {
 
 See `examples/` for full push and CID samples.
 
+## Modern client (context-first, recommended)
+```go
+ctx := context.Background()
+c, err := jpush.NewClient("appKey", "masterSecret")
+if err != nil {
+    panic(err)
+}
+
+// build payload as above
+resp, err := c.Push(ctx, payload)
+if err != nil {
+    panic(err)
+}
+fmt.Println(resp.MsgID)
+```
+
+Deprecated helpers (`Push([]byte)` 等) 会继续工作但会逐步移除，请迁移到 `Client`/context API。
+
+## Migration from legacy helpers
+- Replace `NewJPushClient` + `Push([]byte)` with `NewClient` + `Push(ctx, *PayLoad)`.
+- Inject custom `http.Client` via `WithHTTPClient` for tracing/mocking; set timeout via `WithTimeout`.
+- Handle typed responses (`PushResponse`, `SMSResponse`, etc.) instead of string parsing.
+
 ## SMS
 Template SMS send is available (see `sms_test.go` for an end-to-end example). Fill your own `appKey`/`masterSecret` and template params before running tests.
 
